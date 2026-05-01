@@ -297,18 +297,13 @@ async function init(){
     db = getDatabase(app);
     auth = getAuth(app);
 
-    // Captura el resultado al volver de Google (Corregido)
+    // Captura el resultado al volver de Google
     getRedirectResult(auth)
       .then((result) => {
         if (result) console.log("Login tras redirección exitoso");
       })
       .catch((e) => {
         console.error("Error al volver de la redirección:", e);
-        const errEl = document.getElementById('login-error');
-        if(errEl) {
-            errEl.textContent = 'Error: ' + e.message;
-            errEl.style.display = 'block';
-        }
       });
 
     onAuthStateChanged(auth, user => {
@@ -317,43 +312,28 @@ async function init(){
       } else if(user.email !== AUTHORIZED_EMAIL){
         fbSignOut(auth); 
         show('login-screen');
-        const errEl = document.getElementById('login-error');
-        if(errEl) {
-          errEl.style.display = 'block';
-          errEl.textContent = 'Acceso denegado: email no autorizado.';
-        }
+        alert('Email no autorizado');
       } else {
         show('main-app'); 
         setSyncStatus('online');
-        // Usamos try/catch aquí para que si falla la base de datos no se bloquee la app
         try {
           subscribeMonth(); 
           subscribeBudgets();
         } catch(err) {
-          console.error("Error al suscribir datos:", err);
+          console.error("Error en base de datos:", err);
         }
       }
     });
   } catch(e){
     show('setup-screen');
-    const setupErr = document.getElementById('setup-error');
-    if(setupErr) {
-      setupErr.textContent = 'Error: ' + e.message;
-      setupErr.style.display = 'block';
-    }
+    console.error("Error en init:", e);
   }
 }
 
+// FUNCIONES GLOBALES PARA LOS BOTONES
 window.signInWithGoogle = function() {
-  const errEl = document.getElementById('login-error');
-  if(errEl) errEl.style.display = 'none';
-  
   const provider = new GoogleAuthProvider();
-  // Esto obliga a seleccionar cuenta, evitando que el móvil use una sesión fallida guardada
   provider.setCustomParameters({ prompt: 'select_account' });
-  
-  // IMPORTANTE: Sin 'async' al principio y sin 'await' aquí.
-  // Solo lanzamos la redirección.
   signInWithRedirect(auth, provider);
 };
 
@@ -367,6 +347,9 @@ window.doSignOut = async function() {
   }
 };
 
+// Arrancar la aplicación
+init();
+  
 function subscribeMonth(){
   if(unsubMonth) unsubMonth();
   unsubMonth=onValue(ref(db,dataPath(selectedYear,selectedMonth)),snap=>{
