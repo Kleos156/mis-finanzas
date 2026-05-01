@@ -287,38 +287,52 @@ async function init(){
   if(!cfg){ show('setup-screen'); return; }
   try{
     const app=initializeApp({
-      apiKey:cfg.apiKey,
-      databaseURL:cfg.databaseURL,
-      projectId:cfg.projectId,
-      // Usamos el dominio directo para evitar problemas de resolución en Safari
+      apiKey: cfg.apiKey,
+      databaseURL: cfg.databaseURL,
+      projectId: cfg.projectId,
+      // Usamos el dominio oficial de Firebase para evitar bloqueos de Safari/Chrome móvil
       authDomain: 'mis-finanzas-81ac4.firebaseapp.com', 
     });
 
-    db=getDatabase(app);
-    auth=getAuth(app);
-    
-    // Captura el resultado tras volver de Google en el iPhone
-    getRedirectResult(auth).catch(e => {
-        console.error("Error de redirección:", e);
-        const errEl = document.getElementById('login-error');
-        errEl.textContent = 'Error en Safari: Revisa los ajustes de rastreo.';
-        errEl.style.display = 'block';
-    });
+    db = getDatabase(app);
+    auth = getAuth(app);
 
-    onAuthStateChanged(auth, user=>{
-      if(!user){ show('login-screen'); }
-      else if(user.email!==AUTHORIZED_EMAIL){
-        fbSignOut(auth); show('login-screen');
-        document.getElementById('login-error').style.display='block';
+    // ESTO ES VITAL: Captura el resultado cuando vuelves de Google
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          console.log("Login exitoso tras redirección");
+        }
+      })
+      .catch((error) => {
+        console.error("Error en redirección:", error.code);
+        // Si sale un error aquí, lo veremos en el botón rojo de la web
+        const errEl = document.getElementById('login-error');
+        if(errEl) {
+          errEl.textContent = 'Error: ' + error.message;
+          errEl.style.display = 'block';
+        }
+      });
+
+    onAuthStateChanged(auth, user => {
+      if(!user){ 
+        show('login-screen'); 
+      } else if(user.email !== AUTHORIZED_EMAIL){
+        fbSignOut(auth); 
+        show('login-screen');
+        document.getElementById('login-error').style.display = 'block';
+        document.getElementById('login-error').textContent = 'Acceso denegado: email no autorizado.';
       } else {
-        show('main-app'); setSyncStatus('online');
-        subscribeMonth(); subscribeBudgets();
+        show('main-app'); 
+        setSyncStatus('online');
+        subscribeMonth(); 
+        subscribeBudgets();
       }
     });
   } catch(e){
     show('setup-screen');
-    document.getElementById('setup-error').textContent='Error: '+e.message;
-    document.getElementById('setup-error').style.display='block';
+    document.getElementById('setup-error').textContent = 'Error: ' + e.message;
+    document.getElementById('setup-error').style.display = 'block';
   }
 }
 
