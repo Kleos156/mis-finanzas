@@ -211,7 +211,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const AUTHORIZED_EMAIL = 'vfernandezgo@gmail.com';
@@ -292,6 +292,13 @@ async function init(){
     });
     db=getDatabase(app);
     auth=getAuth(app);
+    
+    // Captura el resultado del inicio de sesión tras la redirección (para iPhone/móvil)
+getRedirectResult(auth).catch(e => {
+    console.error("Error al procesar el login:", e);
+    document.getElementById('login-error').textContent = 'Error: ' + e.message;
+    document.getElementById('login-error').style.display = 'block';
+});
     onAuthStateChanged(auth, user=>{
       if(!user){ show('login-screen'); }
       else if(user.email!==AUTHORIZED_EMAIL){
@@ -312,8 +319,12 @@ async function init(){
 window.signInWithGoogle = async function(){
   const errEl=document.getElementById('login-error');
   errEl.style.display='none';
-  try{ await signInWithPopup(auth, new GoogleAuthProvider()); }
-  catch(e){ errEl.textContent='Error al iniciar sesión.'; errEl.style.display='block'; }
+  try { 
+    await signInWithRedirect(auth, new GoogleAuthProvider()); 
+  } catch(e) { 
+    errEl.textContent='Error al iniciar sesión.'; 
+    errEl.style.display='block'; 
+  }
 };
 window.doSignOut = async function(){
   if(confirm('¿Cerrar sesión?')) await fbSignOut(auth);
