@@ -283,27 +283,30 @@ window.saveFirebaseConfig = function(){
 };
 
 async function init(){
-  const cfg=getFirebaseConfig();
+  const cfg = getFirebaseConfig();
   if(!cfg){ show('setup-screen'); return; }
-  try{
-    const app=initializeApp({
+  
+  try {
+    const app = initializeApp({
       apiKey: cfg.apiKey,
       databaseURL: cfg.databaseURL,
       projectId: cfg.projectId,
-      // Usamos el dominio oficial de Firebase para evitar bloqueos de Safari/Chrome móvil
+      // IMPORTANTE: Dominio fijo para evitar bloqueos en Safari/Android
       authDomain: 'mis-finanzas-81ac4.firebaseapp.com', 
     });
 
     db = getDatabase(app);
     auth = getAuth(app);
 
-    // ESTO ES VITAL: Captura el resultado cuando vuelves de Google
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
-          console.log("Login exitoso tras redirección");
+    // [VITAL PARA MÓVILES] Captura el resultado al volver de Google
+    getRedirectResult(auth).catch(e => {
+        console.error("Error al volver de la redirección:", e);
+        const errEl = document.getElementById('login-error');
+        if(errEl) {
+            errEl.textContent = 'Error: ' + e.message;
+            errEl.style.display = 'block';
         }
-      })
+    });
       .catch((error) => {
         console.error("Error en redirección:", error.code);
         // Si sale un error aquí, lo veremos en el botón rojo de la web
@@ -336,18 +339,26 @@ async function init(){
   }
 }
 
-window.signInWithGoogle = async function(){
-  const errEl=document.getElementById('login-error');
-  errEl.style.display='none';
-  try { 
-    await signInWithRedirect(auth, new GoogleAuthProvider()); 
-  } catch(e) { 
-    errEl.textContent='Error al iniciar sesión.'; 
-    errEl.style.display='block'; 
-  }
+window.signInWithGoogle = function() {
+  const errEl = document.getElementById('login-error');
+  if(errEl) errEl.style.display = 'none';
+  
+  const provider = new GoogleAuthProvider();
+  // Forzar la selección de cuenta ayuda a que el móvil no se quede "atascado" con una sesión vieja
+  provider.setCustomParameters({ prompt: 'select_account' });
+  
+  // IMPORTANTE: Sin async y sin await. Solo lanzamos la orden.
+  signInWithRedirect(auth, provider);
 };
-window.doSignOut = async function(){
-  if(confirm('¿Cerrar sesión?')) await fbSignOut(auth);
+
+window.doSignOut = async function() {
+  if(confirm('¿Cerrar sesión?')) {
+    try {
+      await fbSignOut(auth);
+    } catch(e) {
+      console.error("Error al cerrar sesión:", e);
+    }
+  }
 };
 
 function subscribeMonth(){
