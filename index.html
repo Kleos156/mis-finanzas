@@ -283,25 +283,39 @@ async function init() {
   if(!cfgStr) { show('setup-screen'); return; }
   
   const cfg = JSON.parse(cfgStr);
-  const app = initializeApp({
-    apiKey: cfg.apiKey,
-    databaseURL: cfg.databaseURL,
-    projectId: cfg.projectId,
-    authDomain: "mis-finanzas-81ac4.firebaseapp.com"
-  });
-
-  auth = getAuth(app);
-  db = getDatabase(app);
-
-  // Forzar persistencia para que no se pierda el login al cerrar la pestaña
-  await setPersistence(auth, browserLocalPersistence);
-
-  // CAPTURA EL REDIRECT (Esto rompe el bucle)
   try {
+    const app = initializeApp({
+      apiKey: cfg.apiKey,
+      databaseURL: cfg.databaseURL,
+      projectId: cfg.projectId,
+      authDomain: "mis-finanzas-81ac4.firebaseapp.com"
+    });
+
+    auth = getAuth(app);
+    db = getDatabase(app);
+
+    await setPersistence(auth, browserLocalPersistence);
     await getRedirectResult(auth);
-  } catch (error) {
-    console.error("Error en redirect:", error);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.email === AUTHORIZED_EMAIL) {
+          show('main-app');
+          subscribeMonth();
+          subscribeBudgets();
+        } else {
+          alert("Email no autorizado");
+          fbSignOut(auth);
+        }
+      } else {
+        show('login-screen');
+      }
+    });
+  } catch(e) {
+    console.error("Error inicializando:", e);
+    show('setup-screen');
   }
+}
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
