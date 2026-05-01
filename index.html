@@ -287,18 +287,22 @@ async function init(){
   if(!cfg){ show('setup-screen'); return; }
   try{
     const app=initializeApp({
-      apiKey:cfg.apiKey,databaseURL:cfg.databaseURL,projectId:cfg.projectId,
-      authDomain:cfg.projectId+'.firebaseapp.com',
+      apiKey:cfg.apiKey,
+      databaseURL:cfg.databaseURL,
+      projectId:cfg.projectId,
+      // CAMBIA LA LÍNEA DE ABAJO POR ESTA:
+      authDomain: 'mis-finanzas-81ac4.firebaseapp.com', 
     });
+    
     db=getDatabase(app);
     auth=getAuth(app);
     
     // Captura el resultado del inicio de sesión tras la redirección (para iPhone/móvil)
-getRedirectResult(auth).catch(e => {
-    console.error("Error al procesar el login:", e);
-    document.getElementById('login-error').textContent = 'Error: ' + e.message;
-    document.getElementById('login-error').style.display = 'block';
-});
+    getRedirectResult(auth).catch(e => {
+        console.error("Error al procesar el login:", e);
+        document.getElementById('login-error').textContent = 'Error: ' + e.message;
+        document.getElementById('login-error').style.display = 'block';
+    });
     onAuthStateChanged(auth, user=>{
       if(!user){ show('login-screen'); }
       else if(user.email!==AUTHORIZED_EMAIL){
