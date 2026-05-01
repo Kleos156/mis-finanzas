@@ -59,7 +59,6 @@
   .google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;transition:background .15s;}
   .google-btn:hover{background:var(--surface2);}
   .google-btn svg{width:20px;height:20px;flex-shrink:0;}
-  .login-error{margin-top:1rem;font-size:13px;color:var(--red);background:var(--red-bg);border-radius:var(--radius-sm);padding:8px 12px;display:none;}
 
   .app{max-width:520px;margin:0 auto;}
   .header{background:var(--surface);border-bottom:.5px solid var(--border);padding:1rem 1.25rem 0;position:sticky;top:0;z-index:20;}
@@ -106,9 +105,6 @@
   .cat-footer{display:flex;justify-content:space-between;align-items:center;}
   .cat-remaining{font-size:12px;}
   .r-ok{color:var(--green);}.r-warn{color:var(--amber);}.r-over{color:var(--red);}
-  .badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap;}
-  .badge-warn{background:var(--amber-bg);color:var(--amber);}
-  .badge-over{background:var(--red-bg);color:var(--red);}
   .add-btn{font-size:12px;color:var(--text2);background:transparent;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;font-family:inherit;}
 
   .entries{margin-top:8px;border-top:.5px solid var(--border);padding-top:8px;}
@@ -143,24 +139,18 @@
 
 <div id="loading-screen" class="loading">
   <div class="spinner"></div>
-  <span>Conectando...</span>
+  <span>Conectando con Firebase...</span>
 </div>
 
 <div id="setup-screen" class="fullpage" style="display:none">
   <div class="card">
-    <h1>Mis Finanzas</h1>
-    <p class="sub">Configura Firebase una sola vez para sincronizar datos entre dispositivos.</p>
-    <div class="steps">
-      <div class="step"><span class="step-num">1</span><span>Ve a <strong>console.firebase.google.com</strong> y crea un proyecto.</span></div>
-      <div class="step"><span class="step-num">2</span><span>Compilación → <strong>Realtime Database</strong> → Crear base de datos.</span></div>
-      <div class="step"><span class="step-num">3</span><span>Configuración ⚙ → Tus apps → <strong>&lt;/&gt;</strong> → copia apiKey, databaseURL y projectId.</span></div>
-      <div class="step"><span class="step-num">4</span><span>Authentication → Proveedores → <strong>Google → Activar</strong>.</span></div>
-    </div>
-    <div class="field"><label>API Key</label><input id="cfg-apikey" type="text" placeholder="AIzaSy..." autocomplete="off"/></div>
-    <div class="field"><label>Database URL</label><input id="cfg-dburl" type="text" placeholder="https://tu-proyecto.firebasedatabase.app" autocomplete="off"/></div>
-    <div class="field"><label>Project ID</label><input id="cfg-project" type="text" placeholder="tu-proyecto-12345" autocomplete="off"/></div>
-    <div class="err-msg" id="setup-error">Por favor completa todos los campos.</div>
-    <button class="btn-primary" onclick="saveFirebaseConfig()">Guardar y conectar</button>
+    <h1>Configuración</h1>
+    <p class="sub">Vincule su proyecto de Firebase para sincronizar sus datos.</p>
+    <div class="field"><label for="cfg-apikey">API Key</label><input id="cfg-apikey" type="text" spellcheck="false" autocomplete="off"/></div>
+    <div class="field"><label for="cfg-dburl">Database URL</label><input id="cfg-dburl" type="text" spellcheck="false" autocomplete="off"/></div>
+    <div class="field"><label for="cfg-project">Project ID</label><input id="cfg-project" type="text" spellcheck="false" autocomplete="off"/></div>
+    <div class="err-msg" id="setup-error">Por favor, rellene todos los campos.</div>
+    <button class="btn-primary" onclick="saveFirebaseConfig()">Guardar y Conectar</button>
   </div>
 </div>
 
@@ -168,12 +158,11 @@
   <div class="card login-card">
     <div class="login-icon">💰</div>
     <h1>Mis Finanzas</h1>
-    <p>Accede con tu cuenta de Google para gestionar tus finanzas de forma segura.</p>
+    <p>Acceda de forma segura con su cuenta de Google.</p>
     <button class="google-btn" onclick="signInWithGoogle()">
       <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-      Entrar con Google
+      Iniciar Sesión
     </button>
-    <div class="login-error" id="login-error">Error al iniciar sesión.</div>
   </div>
 </div>
 
@@ -183,13 +172,13 @@
       <div class="header-top">
         <div>
           <h1>Mis Finanzas</h1>
-          <div class="header-month" id="header-month">—</div>
+          <div class="header-month" id="header-month">--</div>
         </div>
-        <div class="sync-dot" id="sync-indicator"><span class="dot"></span><span id="sync-text">—</span></div>
+        <div class="sync-dot" id="sync-indicator"><span class="dot"></span><span id="sync-text">Conectado</span></div>
       </div>
       <div class="header-actions">
         <button class="cfg-btn" onclick="openConfig()">⚙ Presupuestos</button>
-        <button class="cfg-btn" onclick="doSignOut()" style="margin-left:auto;font-size:11px;opacity:.6;">Salir</button>
+        <button class="cfg-btn" onclick="doSignOut()" style="margin-left:auto; opacity:0.6">Salir</button>
       </div>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
@@ -201,7 +190,7 @@
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <h2 id="modal-title">Presupuestos</h2>
-    <p class="modal-subtitle" id="modal-subtitle"></p>
+    <p class="modal-subtitle">Ajuste los límites de gasto para este mes.</p>
     <div id="modal-rows"></div>
     <div class="modal-actions">
       <button class="modal-copy" onclick="copyFromPrev()">↩ Copiar anterior</button>
@@ -213,27 +202,35 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as fbSignOut }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithRedirect, 
+  getRedirectResult, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence,
+  signOut as fbSignOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const AUTHORIZED_EMAIL = 'vfernandezgo@gmail.com';
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 const CATEGORIES = [
-  {id:'comidas',   name:'Comidas en la calle',  icon:'🍽', type:'gasto'},
-  {id:'compras',   name:'Compras',              icon:'🛍', type:'gasto'},
-  {id:'varios',    name:'Gastos varios',        icon:'💡', type:'gasto'},
-  {id:'super',     name:'Supermercado',         icon:'🛒', type:'gasto'},
-  {id:'regalos',   name:'Regalos',              icon:'🎁', type:'gasto'},
-  {id:'ingles',    name:'Clases de inglés',     icon:'📚', type:'gasto'},
-  {id:'limpieza',  name:'Servicio de limpieza', icon:'🧹', type:'gasto'},
-  {id:'peluqueria',name:'Peluquería',           icon:'✂️', type:'gasto'},
-  {id:'costura',   name:'Corte y confección',   icon:'🪡', type:'gasto'},
-  {id:'yoga',      name:'Yoga',                 icon:'🧘', type:'gasto'},
-  {id:'gasolina',  name:'Gasolina',             icon:'⛽', type:'gasto'},
-  {id:'viajes',    name:'Viajes',               icon:'✈️', type:'gasto'},
-  {id:'ingresos',  name:'Ingresos extra',       icon:'💰', type:'ingreso'},
+  {id:'comidas',   name:'Comidas fuera', icon:'🍽', type:'gasto'},
+  {id:'compras',   name:'Compras', icon:'🛍', type:'gasto'},
+  {id:'varios',    name:'Gastos varios', icon:'💡', type:'gasto'},
+  {id:'super',     name:'Supermercado', icon:'🛒', type:'gasto'},
+  {id:'regalos',   name:'Regalos', icon:'🎁', type:'gasto'},
+  {id:'ingles',    name:'Inglés', icon:'📚', type:'gasto'},
+  {id:'limpieza',  name:'Limpieza', icon:'🧹', type:'gasto'},
+  {id:'peluqueria',name:'Peluquería', icon:'✂️', type:'gasto'},
+  {id:'costura',   name:'Costura', icon:'🪡', type:'gasto'},
+  {id:'yoga',      name:'Yoga', icon:'🧘', type:'gasto'},
+  {id:'gasolina',  name:'Gasolina', icon:'⛽', type:'gasto'},
+  {id:'viajes',    name:'Viajes', icon:'✈️', type:'gasto'},
+  {id:'ingresos',  name:'Ingresos extra', icon:'💰', type:'ingreso'},
 ];
 
 const DEFAULT_BUDGETS = {
@@ -242,23 +239,21 @@ const DEFAULT_BUDGETS = {
   gasolina:100,viajes:300
 };
 
-const now = new Date();
-let selectedMonth = now.getMonth();
-let selectedYear = now.getFullYear();
-let openForms = {};
-let db = null, auth = null;
+let auth, db;
+let selectedMonth = new Date().getMonth();
+let selectedYear = new Date().getFullYear();
 let monthDataCache = {};
 let budgetsCache = {...DEFAULT_BUDGETS};
-let unsubMonth = null, unsubBudgets = null;
+let openForms = {};
+let unsubMonth, unsubBudgets;
 
 function monthKey(y,m){ return `${y}_${String(m+1).padStart(2,'0')}`; }
 function budgetsPath(y,m){ return `presupuestos/${monthKey(y,m)}`; }
 function dataPath(y,m){ return `datos/${monthKey(y,m)}`; }
 
-function show(id){
-  ['loading-screen','setup-screen','login-screen','main-app'].forEach(s=>{
-    const el = document.getElementById(s);
-    if(el) el.style.display = s===id ? (id==='main-app'?'block':'flex') : 'none';
+function show(id) {
+  ['loading-screen','setup-screen','login-screen','main-app'].forEach(s => {
+    document.getElementById(s).style.display = (s === id) ? (id==='main-app'?'block':'flex') : 'none';
   });
 }
 
@@ -266,315 +261,233 @@ function setSyncStatus(s){
   const ind = document.getElementById('sync-indicator');
   const txt = document.getElementById('sync-text');
   if(ind) ind.className='sync-dot '+s;
-  if(txt) txt.textContent=s==='online'?'Sincronizado':s==='syncing'?'Guardando...':'Sin conexión';
+  if(txt) txt.textContent=s==='online'?'Sincronizado':s==='syncing'?'Guardando...':'Error';
 }
 
-function formatEur(n){ return (n||0).toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
-function totalSpent(catId){ return (monthDataCache[catId]||[]).reduce((s,e)=>s+(e.amount||0),0); }
-function today(){ const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); }
-
-function getFirebaseConfig(){
-  try{ const s=JSON.parse(localStorage.getItem('fin_firebase_cfg')); if(s&&s.apiKey) return s; }catch(e){}
-  return null;
-}
-
-window.saveFirebaseConfig = function(){
-  const apiKey=document.getElementById('cfg-apikey').value.trim();
-  const databaseURL=document.getElementById('cfg-dburl').value.trim();
-  const projectId=document.getElementById('cfg-project').value.trim();
-  const errEl=document.getElementById('setup-error');
-  if(!apiKey||!databaseURL||!projectId){ if(errEl) errEl.style.display='block'; return; }
-  localStorage.setItem('fin_firebase_cfg',JSON.stringify({apiKey,databaseURL,projectId}));
-  location.reload();
+window.saveFirebaseConfig = function() {
+  const cfg = {
+    apiKey: document.getElementById('cfg-apikey').value.trim(),
+    databaseURL: document.getElementById('cfg-dburl').value.trim(),
+    projectId: document.getElementById('cfg-project').value.trim()
+  };
+  if(cfg.apiKey && cfg.databaseURL && cfg.projectId) {
+    localStorage.setItem('fin_firebase_cfg', JSON.stringify(cfg));
+    location.reload();
+  } else {
+    document.getElementById('setup-error').style.display = 'block';
+  }
 };
 
-async function init(){
-  const cfg = getFirebaseConfig();
-  if(!cfg){ show('setup-screen'); return; }
+async function init() {
+  const cfgStr = localStorage.getItem('fin_firebase_cfg');
+  if(!cfgStr) { show('setup-screen'); return; }
   
+  const cfg = JSON.parse(cfgStr);
   try {
     const app = initializeApp({
       apiKey: cfg.apiKey,
       databaseURL: cfg.databaseURL,
       projectId: cfg.projectId,
-      authDomain: cfg.projectId + '.firebaseapp.com', 
+      authDomain: `${cfg.projectId}.firebaseapp.com`
     });
 
-    db = getDatabase(app);
     auth = getAuth(app);
+    db = getDatabase(app);
 
-    getRedirectResult(auth).catch(e => console.error("Error redirect:", e));
+    await setPersistence(auth, browserLocalPersistence);
+    await getRedirectResult(auth);
 
-    onAuthStateChanged(auth, user => {
-      if(!user){ 
-        show('login-screen'); 
-      } else if(user.email !== AUTHORIZED_EMAIL){
-        fbSignOut(auth); 
-        show('login-screen');
-        alert('Email no autorizado: ' + user.email);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.email === AUTHORIZED_EMAIL) {
+          show('main-app');
+          subscribeMonth();
+          subscribeBudgets();
+        } else {
+          alert("Email no autorizado");
+          fbSignOut(auth);
+        }
       } else {
-        show('main-app'); 
-        setSyncStatus('online');
-        subscribeMonth(); 
-        subscribeBudgets();
+        show('login-screen');
       }
     });
-  } catch(e){
-    console.error("Init error:", e);
+  } catch(e) {
+    console.error(e);
     show('setup-screen');
   }
 }
 
 window.signInWithGoogle = function() {
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
   signInWithRedirect(auth, provider);
 };
 
-window.doSignOut = async function() {
-  if(confirm('¿Cerrar sesión?')) await fbSignOut(auth);
+window.doSignOut = function() {
+  if(confirm('¿Cerrar sesión?')) fbSignOut(auth);
 };
 
 function subscribeMonth(){
   if(unsubMonth) unsubMonth();
-  unsubMonth=onValue(ref(db,dataPath(selectedYear,selectedMonth)),snap=>{
-    monthDataCache=snap.val()||{};
+  unsubMonth = onValue(ref(db, dataPath(selectedYear, selectedMonth)), snap => {
+    monthDataCache = snap.val() || {};
     render();
   });
-}
-
-async function getClosestBudgets(y,m){
-  for(let i=1;i<=12;i++){
-    let pm=m-i,py=y;
-    while(pm<0){pm+=12;py--;}
-    const snap=await get(ref(db,budgetsPath(py,pm)));
-    if(snap.val()) return snap.val();
-  }
-  return null;
 }
 
 function subscribeBudgets(){
   if(unsubBudgets) unsubBudgets();
-  unsubBudgets=onValue(ref(db,budgetsPath(selectedYear,selectedMonth)),async snap=>{
-    let val=snap.val();
-    if(!val) val=await getClosestBudgets(selectedYear,selectedMonth);
-    budgetsCache=val?{...DEFAULT_BUDGETS,...val}:{...DEFAULT_BUDGETS};
+  unsubBudgets = onValue(ref(db, budgetsPath(selectedYear, selectedMonth)), async snap => {
+    let val = snap.val();
+    if(!val) {
+        // Intentar buscar el presupuesto más reciente de meses anteriores si el actual está vacío
+        const prevSnap = await get(ref(db, `presupuestos`));
+        if(prevSnap.exists()){
+            const all = prevSnap.val();
+            const keys = Object.keys(all).sort().reverse();
+            val = all[keys[0]];
+        }
+    }
+    budgetsCache = val ? {...DEFAULT_BUDGETS, ...val} : {...DEFAULT_BUDGETS};
     render();
   });
 }
 
-async function saveMonthData(data){
-  setSyncStatus('syncing');
-  try{ await set(ref(db,dataPath(selectedYear,selectedMonth)),data); setSyncStatus('online'); }
-  catch(e){ setSyncStatus('error'); }
-}
-
-async function saveCurrentBudgets(b){
-  setSyncStatus('syncing');
-  try{ await set(ref(db,budgetsPath(selectedYear,selectedMonth)),b); setSyncStatus('online'); }
-  catch(e){ setSyncStatus('error'); }
-}
-
-function renderTabs(){
-  const container=document.getElementById('month-tabs');
-  if(!container) return;
-  container.innerHTML='';
-  MESES.forEach((m,i)=>{
-    const btn=document.createElement('button');
-    btn.className='tab'+(i===selectedMonth?' active':'');
-    btn.textContent=m;
-    btn.onclick=()=>{
-      selectedMonth=i; openForms={};
-      subscribeMonth(); subscribeBudgets();
-      renderTabs();
-    };
-    container.appendChild(btn);
-  });
-}
+// LÓGICA DE RENDERIZADO (FUSIONADA)
+function formatEur(n){ return (n||0).toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
+function totalSpent(catId){ return (monthDataCache[catId]||[]).reduce((s,e)=>s+(e.amount||0),0); }
 
 function render(){
-  renderTabs();
-  const headerMo = document.getElementById('header-month');
-  if(headerMo) headerMo.textContent=MESES_FULL[selectedMonth]+' '+selectedYear;
-  
-  const gastos=CATEGORIES.filter(c=>c.type==='gasto');
-  const ingresos=CATEGORIES.filter(c=>c.type==='ingreso');
-  
-  let totalG=0; gastos.forEach(c=>{totalG+=totalSpent(c.id);});
-  const presTotal=gastos.reduce((s,c)=>s+(budgetsCache[c.id]||0),0);
-  let totalI=0; ingresos.forEach(c=>{totalI+=totalSpent(c.id);});
-  const restante=presTotal-totalG;
-  const pct=presTotal>0?Math.round((totalG/presTotal)*100):0;
+  const container = document.getElementById('month-tabs');
+  container.innerHTML = '';
+  MESES.forEach((m,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i===selectedMonth ? ' active' : '');
+    btn.textContent = m;
+    btn.onclick = () => { selectedMonth = i; subscribeMonth(); subscribeBudgets(); };
+    container.appendChild(btn);
+  });
 
-  let html=`
+  document.getElementById('header-month').textContent = MESES_FULL[selectedMonth] + ' ' + selectedYear;
+  
+  const gastos = CATEGORIES.filter(c=>c.type==='gasto');
+  const ingresos = CATEGORIES.filter(c=>c.type==='ingreso');
+  
+  let totalG = 0; gastos.forEach(c => totalG += totalSpent(c.id));
+  let totalI = 0; ingresos.forEach(c => totalI += totalSpent(c.id));
+  const presTotal = gastos.reduce((s,c) => s + (budgetsCache[c.id]||0), 0);
+  const restante = presTotal - totalG;
+
+  let html = `
     <div class="summary-grid">
-      <div class="summary-card">
-        <div class="s-label">Gastado</div>
-        <div class="s-value" style="color:var(--red-mid)">${formatEur(totalG)}</div>
-        <div class="s-sub">${pct}% del presupuesto</div>
-      </div>
-      <div class="summary-card">
-        <div class="s-label">Restante</div>
-        <div class="s-value" style="color:${restante<0?'var(--red-mid)':'var(--green-mid)'}">${formatEur(restante)}</div>
-        <div class="s-sub">de ${formatEur(presTotal)}</div>
-      </div>
-      <div class="summary-card full income-card">
-        <div class="s-label">Ingresos extra</div>
-        <div class="s-value">${formatEur(totalI)}</div>
-      </div>
+      <div class="summary-card"><div class="s-label">Gastado</div><div class="s-value" style="color:var(--red-mid)">${formatEur(totalG)}</div></div>
+      <div class="summary-card"><div class="s-label">Restante</div><div class="s-value" style="color:${restante<0?'var(--red-mid)':'var(--green-mid)'}">${formatEur(restante)}</div></div>
+      <div class="summary-card full income-card"><div class="s-label">Ingresos extra</div><div class="s-value">${formatEur(totalI)}</div></div>
     </div>
-    <div class="section-title">Gastos</div>`;
+    <div class="section-title">Categorías</div>`;
+
+  gastos.forEach(cat => {
+    const spent = totalSpent(cat.id);
+    const budget = budgetsCache[cat.id]||0;
+    const pct = budget > 0 ? Math.min((spent/budget)*100, 100) : 0;
+    const isOver = spent > budget && budget > 0;
+    const entries = monthDataCache[cat.id] || [];
     
-  gastos.forEach(c=>{html+=renderCatCard(c);});
-  html+=`<div class="section-title">Ingresos</div>`;
-  ingresos.forEach(c=>{html+=renderIngresoCard(c);});
-  
-  const content = document.getElementById('content');
-  if(content) content.innerHTML=html;
-  attachListeners();
-}
-
-function renderCatCard(cat){
-  const spent=totalSpent(cat.id);
-  const budget=budgetsCache[cat.id]||0;
-  const pct=budget>0?Math.min((spent/budget)*100,100):(spent>0?100:0);
-  const remaining=budget-spent;
-  const isWarn=budget>0&&pct>=80&&spent<=budget;
-  const isOver=spent>budget&&budget>0;
-  
-  const fillClass=isOver?'p-over':(isWarn?'p-warn':'p-ok');
-  const remClass=isOver?'r-over':(isWarn?'r-warn':'r-ok');
-  const cardClass=isOver?'cat-card over':(isWarn?'cat-card warn':'cat-card');
-  const entries=monthDataCache[cat.id]||[];
-  const showForm=openForms[cat.id];
-  
-  let entriesHtml='';
-  if(entries.length>0||showForm){
-    entriesHtml=`<div class="entries">`;
-    entries.forEach((e,i)=>{
-      entriesHtml+=`<div class="entry-row">
-        <span class="entry-desc">${e.desc||'—'}</span>
-        <span class="entry-date">${e.date||''}</span>
-        <span class="entry-amount">${formatEur(e.amount)}</span>
-        <button class="entry-del" data-cat="${cat.id}" data-idx="${i}">×</button>
+    html += `
+      <div class="cat-card ${isOver?'over':''}">
+        <div class="cat-header">
+          <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
+          <div class="cat-amounts"><b>${formatEur(spent)}</b> / <small>${formatEur(budget)}</small></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill ${isOver?'p-over':'p-ok'}" style="width:${pct}%"></div></div>
+        <div class="cat-footer">
+            <span class="cat-remaining">${isOver?'Excedido':'Queda'} ${formatEur(Math.abs(budget-spent))}</span>
+            <button class="add-btn" onclick="toggleForm('${cat.id}')">${openForms[cat.id]?'Cerrar':'+ Añadir'}</button>
+        </div>
+        ${renderEntries(cat.id, entries)}
       </div>`;
-    });
-    if(showForm) entriesHtml+=`<div class="add-form">
-      <input type="text" id="desc-${cat.id}" placeholder="Descripción"/>
-      <input type="number" id="amt-${cat.id}" placeholder="€" step="0.01"/>
-      <button data-add="${cat.id}">+</button>
+  });
+
+  html += `<div class="section-title">Ingresos</div>`;
+  ingresos.forEach(cat => {
+    html += `
+    <div class="cat-card income-card">
+        <div class="cat-header">
+          <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
+          <div class="cat-amounts"><b>${formatEur(totalSpent(cat.id))}</b></div>
+        </div>
+        <div class="cat-footer"><span></span><button class="add-btn" onclick="toggleForm('${cat.id}')">${openForms[cat.id]?'Cerrar':'+ Añadir'}</button></div>
+        ${renderEntries(cat.id, monthDataCache[cat.id]||[])}
     </div>`;
-    entriesHtml+=`</div>`;
+  });
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderEntries(catId, entries){
+  if(!openForms[catId] && entries.length === 0) return '';
+  let h = '<div class="entries">';
+  entries.forEach((e, idx) => {
+    h += `<div class="entry-row">
+      <span class="entry-desc">${e.desc}</span>
+      <span class="entry-amount">${formatEur(e.amount)}</span>
+      <button class="entry-del" onclick="deleteEntry('${catId}', ${idx})">×</button>
+    </div>`;
+  });
+  if(openForms[catId]){
+    h += `<div class="add-form">
+      <input type="text" id="in-desc-${catId}" placeholder="Concepto" />
+      <input type="number" id="in-amt-${catId}" placeholder="€" />
+      <button onclick="addEntry('${catId}')">OK</button>
+    </div>`;
   }
+  return h + '</div>';
+}
+
+window.toggleForm = (id) => { openForms[id] = !openForms[id]; render(); };
+
+window.addEntry = async (catId) => {
+  const desc = document.getElementById(`in-desc-${catId}`).value || 'Gasto';
+  const amount = parseFloat(document.getElementById(`in-amt-${catId}`).value);
+  if(!amount) return;
   
-  return `<div class="${cardClass}">
-    <div class="cat-header">
-      <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
-      <div class="cat-amounts"><div class="cat-spent">${formatEur(spent)}</div><div class="cat-budget">de ${formatEur(budget)}</div></div>
-    </div>
-    <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
-    <div class="cat-footer">
-      <span class="cat-remaining ${remClass}">${isOver?'Excedido '+formatEur(Math.abs(remaining)):'Quedan '+formatEur(remaining)}</span>
-      <button class="add-btn" data-toggle="${cat.id}">${showForm?'Cerrar':'+ Añadir'}</button>
-    </div>
-    ${entriesHtml}
-  </div>`;
-}
+  setSyncStatus('syncing');
+  const newData = {...monthDataCache};
+  if(!newData[catId]) newData[catId] = [];
+  newData[catId].push({desc, amount, date: new Date().toISOString()});
+  await set(ref(db, dataPath(selectedYear, selectedMonth)), newData);
+  openForms[catId] = false;
+  setSyncStatus('online');
+};
 
-function renderIngresoCard(cat){
-  const entries=monthDataCache[cat.id]||[];
-  const total=totalSpent(cat.id);
-  const showForm=openForms[cat.id];
-  let entriesHtml='';
-  if(entries.length>0||showForm){
-    entriesHtml=`<div class="entries">`;
-    entries.forEach((e,i)=>{
-      entriesHtml+=`<div class="entry-row">
-        <span class="entry-desc">${e.desc||'—'}</span>
-        <span class="entry-date">${e.date||''}</span>
-        <span class="entry-amount" style="color:var(--green)">${formatEur(e.amount)}</span>
-        <button class="entry-del" data-cat="${cat.id}" data-idx="${i}">×</button>
-      </div>`;
+window.deleteEntry = async (catId, idx) => {
+  if(!confirm('¿Eliminar apunte?')) return;
+  const newData = {...monthDataCache};
+  newData[catId].splice(idx, 1);
+  await set(ref(db, dataPath(selectedYear, selectedMonth)), newData);
+};
+
+window.openConfig = () => {
+    let h = '';
+    CATEGORIES.filter(c=>c.type==='gasto').forEach(cat => {
+        h += `<div class="modal-row">
+            <div class="modal-label">${cat.icon} ${cat.name}</div>
+            <input type="number" id="cfg-val-${cat.id}" value="${budgetsCache[cat.id]||0}" />
+        </div>`;
     });
-    if(showForm) entriesHtml+=`<div class="add-form">
-      <input type="text" id="desc-${cat.id}" placeholder="Concepto"/>
-      <input type="number" id="amt-${cat.id}" placeholder="€" step="0.01"/>
-      <button data-add="${cat.id}">+</button>
-    </div>`;
-    entriesHtml+=`</div>`;
-  }
-  return `<div class="cat-card income-card">
-    <div class="cat-header">
-      <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
-      <div class="cat-amounts"><div class="cat-spent">${formatEur(total)}</div></div>
-    </div>
-    <div class="cat-footer"><span></span><button class="add-btn" data-toggle="${cat.id}">${showForm?'Cerrar':'+ Añadir'}</button></div>
-    ${entriesHtml}
-  </div>`;
-}
-
-function attachListeners(){
-  document.querySelectorAll('[data-toggle]').forEach(btn=>{
-    btn.onclick=()=>{ const id=btn.dataset.toggle; openForms[id]=!openForms[id]; render(); };
-  });
-  document.querySelectorAll('[data-add]').forEach(btn=>{
-    btn.onclick=async()=>{
-      const id=btn.dataset.add;
-      const desc=document.getElementById('desc-'+id).value.trim();
-      const amt=parseFloat(document.getElementById('amt-'+id).value);
-      if(!amt) return;
-      const newData={...monthDataCache};
-      if(!newData[id]) newData[id]=[];
-      newData[id].push({desc, amount:amt, date:today()});
-      openForms[id]=false;
-      await saveMonthData(newData);
-    };
-  });
-  document.querySelectorAll('[data-idx]').forEach(btn=>{
-    btn.onclick=async()=>{
-      if(!confirm('¿Eliminar?')) return;
-      const id=btn.dataset.cat; const idx=parseInt(btn.dataset.idx);
-      const newData={...monthDataCache};
-      newData[id].splice(idx,1);
-      await saveMonthData(newData);
-    };
-  });
-}
-
-window.openConfig = function(){
-  document.getElementById('modal-title').textContent=`Presupuestos — ${MESES_FULL[selectedMonth]}`;
-  let html='';
-  CATEGORIES.filter(c=>c.type==='gasto').forEach(cat=>{
-    html+=`<div class="modal-row">
-      <div class="modal-label"><span>${cat.icon}</span>${cat.name}</div>
-      <input type="number" id="cfg-${cat.id}" value="${budgetsCache[cat.id]||0}"/>
-    </div>`;
-  });
-  document.getElementById('modal-rows').innerHTML=html;
-  document.getElementById('cfg-modal').style.display='flex';
+    document.getElementById('modal-rows').innerHTML = h;
+    document.getElementById('cfg-modal').style.display = 'flex';
 };
 
-window.copyFromPrev = async function(){
-  let pm=selectedMonth-1, py=selectedYear;
-  if(pm<0){pm=11;py--;}
-  const snap=await get(ref(db,budgetsPath(py,pm)));
-  if(!snap.val()) return alert('No hay datos previos');
-  CATEGORIES.filter(c=>c.type==='gasto').forEach(cat=>{
-    const inp=document.getElementById('cfg-'+cat.id);
-    if(inp && snap.val()[cat.id]) inp.value=snap.val()[cat.id];
-  });
+window.closeConfig = async () => {
+    const newBudgets = {};
+    CATEGORIES.filter(c=>c.type==='gasto').forEach(cat => {
+        newBudgets[cat.id] = parseFloat(document.getElementById(`cfg-val-${cat.id}`).value) || 0;
+    });
+    await set(ref(db, budgetsPath(selectedYear, selectedMonth)), newBudgets);
+    document.getElementById('cfg-modal').style.display = 'none';
 };
 
-window.closeConfig = async function(){
-  const nb={};
-  CATEGORIES.filter(c=>c.type==='gasto').forEach(cat=>{
-    nb[cat.id]=parseFloat(document.getElementById('cfg-'+cat.id).value)||0;
-  });
-  document.getElementById('cfg-modal').style.display='none';
-  await saveCurrentBudgets(nb);
-};
-
-window.handleModalBgClick = (e) => { if(e.target.id==='cfg-modal') window.closeConfig(); };
+window.handleModalBgClick = (e) => { if(e.target.id === 'cfg-modal') document.getElementById('cfg-modal').style.display = 'none'; };
 
 init();
 </script>
