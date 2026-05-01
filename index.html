@@ -290,19 +290,21 @@ async function init(){
       apiKey:cfg.apiKey,
       databaseURL:cfg.databaseURL,
       projectId:cfg.projectId,
-      // CAMBIA LA LÍNEA DE ABAJO POR ESTA:
+      // Usamos el dominio directo para evitar problemas de resolución en Safari
       authDomain: 'mis-finanzas-81ac4.firebaseapp.com', 
     });
-    
+
     db=getDatabase(app);
     auth=getAuth(app);
     
-    // Captura el resultado del inicio de sesión tras la redirección (para iPhone/móvil)
+    // Captura el resultado tras volver de Google en el iPhone
     getRedirectResult(auth).catch(e => {
-        console.error("Error al procesar el login:", e);
-        document.getElementById('login-error').textContent = 'Error: ' + e.message;
-        document.getElementById('login-error').style.display = 'block';
+        console.error("Error de redirección:", e);
+        const errEl = document.getElementById('login-error');
+        errEl.textContent = 'Error en Safari: Revisa los ajustes de rastreo.';
+        errEl.style.display = 'block';
     });
+
     onAuthStateChanged(auth, user=>{
       if(!user){ show('login-screen'); }
       else if(user.email!==AUTHORIZED_EMAIL){
