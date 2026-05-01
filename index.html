@@ -3,10 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Mis Finanzas" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Mis Finanzas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
@@ -29,432 +25,202 @@
     --red:#F09595;--red-bg:#501313;--red-mid:#E24B4A;--accent:#F0EFE9;
   }}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:'DM Sans','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;}
 
-  .spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--text2);border-radius:50%;animation:spin .8s linear infinite;}
+  .loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text2);}
+  .spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--text2);border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  @keyframes fadein{from{opacity:0}to{opacity:1}}
-  @keyframes slideup{from{transform:translateY(40px)}to{transform:translateY(0)}}
 
-  .loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text2);font-size:14px;}
-  .fullpage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
-  .card{background:var(--surface);border:.5px solid var(--border);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:460px;}
-  .card h1{font-size:22px;font-weight:600;letter-spacing:-.03em;margin-bottom:.5rem;}
-  .card .sub{font-size:14px;color:var(--text2);margin-bottom:1.75rem;line-height:1.6;}
+  .setup-page{padding:2rem 1.5rem;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+  .card{background:var(--surface);border:.5px solid var(--border);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:400px;}
   .field{margin-bottom:1rem;}
-  .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
-  .field input{width:100%;font-family:'DM Mono',monospace;font-size:13px;padding:10px 12px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);outline:none;}
-  .field input:focus{border-color:var(--accent);}
-  .btn-primary{width:100%;padding:13px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);font-size:15px;font-family:inherit;font-weight:500;cursor:pointer;}
-  .err-msg{font-size:12px;color:var(--red);margin-top:.5rem;display:none;}
-
-  .card.login-card{text-align:center;max-width:380px;padding:2.5rem 2rem;}
-  .login-icon{font-size:40px;margin-bottom:1rem;}
-  .card.login-card p{font-size:14px;color:var(--text2);margin-bottom:2rem;line-height:1.6;}
-  .google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);font-family:inherit;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;transition:background .15s;}
-  .google-btn:hover{background:var(--surface2);}
-  .google-btn svg{width:20px;height:20px;flex-shrink:0;}
+  .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;}
+  .field input{width:100%;font-family:'DM Mono',monospace;padding:10px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);}
+  .btn-primary{width:100%;padding:13px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);font-weight:500;cursor:pointer;}
 
   .app{max-width:520px;margin:0 auto;}
-  .header{background:var(--surface);border-bottom:.5px solid var(--border);padding:1rem 1.25rem 0;position:sticky;top:0;z-index:20;}
-  .header-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.75rem;}
-  .header h1{font-size:18px;font-weight:600;letter-spacing:-.02em;}
-  .header-month{font-size:12px;color:var(--text2);margin-top:1px;}
-  .sync-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);padding:4px 10px;border:.5px solid var(--border2);border-radius:20px;background:var(--surface2);white-space:nowrap;}
-  .sync-dot .dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
-  .sync-dot.online .dot{background:var(--green-mid);}
-  .sync-dot.syncing .dot{background:var(--amber-mid);animation:pulse 1s infinite;}
-  .cfg-btn{display:flex;align-items:center;gap:5px;background:transparent;border:.5px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;}
-  .header-actions{display:flex;gap:8px;align-items:center;padding-bottom:.75rem;}
+  .header{background:var(--surface);border-bottom:.5px solid var(--border);padding:1rem 1.25rem;position:sticky;top:0;z-index:20;}
+  .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .sync-dot{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--text3);}
+  .online .dot{background:var(--green-mid);}
 
-  .month-tabs{display:flex;gap:4px;overflow-x:auto;padding:.5rem 1.25rem;scrollbar-width:none;background:var(--surface);}
-  .month-tabs::-webkit-scrollbar{display:none;}
-  .tab{flex-shrink:0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:.5px solid var(--border2);background:transparent;color:var(--text2);transition:all .15s;font-family:inherit;}
+  .month-tabs{display:flex;gap:4px;overflow-x:auto;padding:0.5rem 1.25rem;background:var(--surface);scrollbar-width:none;}
+  .tab{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;border:.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;}
   .tab.active{background:var(--accent);color:var(--bg);border-color:transparent;}
 
-  .content{padding:1rem 1.25rem 6rem;}
-  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem;}
-  .summary-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem;}
+  .content{padding:1rem 1.25rem 5rem;}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem;}
+  .summary-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem;}
   .summary-card.full{grid-column:span 2;}
-  .s-label{font-size:11px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
-  .s-value{font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1.1;}
-  .income-card{background:var(--green-bg)!important;border-color:rgba(99,153,34,.2)!important;}
-  .income-card .s-value{color:var(--green)!important;}
+  .s-label{font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:2px;}
+  .s-value{font-size:20px;font-weight:600;}
 
-  .section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:1.5rem 0 .625rem;}
-  .cat-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:.875rem 1rem;margin-bottom:8px;}
-  .cat-card.over{border-color:rgba(226,75,74,.4);}
-  .cat-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
-  .cat-left{display:flex;align-items:center;gap:8px;}
-  .cat-icon{width:32px;height:32px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-  .cat-name{font-size:13px;font-weight:500;}
-  .cat-amounts{text-align:right;flex-shrink:0;}
-  .cat-spent{font-size:15px;font-weight:600;}
-  .progress-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:8px;}
-  .progress-fill{height:100%;border-radius:2px;transition:width .4s ease;}
-  .p-ok{background:var(--green-mid);}.p-over{background:var(--red-mid);}
-  .cat-footer{display:flex;justify-content:space-between;align-items:center;}
-  .cat-remaining{font-size:12px;}
-  .add-btn{font-size:12px;color:var(--text2);background:transparent;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;font-family:inherit;}
+  .cat-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:10px;}
+  .cat-header{display:flex;justify-content:space-between;margin-bottom:10px;}
+  .cat-info{display:flex;align-items:center;gap:8px;}
+  .cat-icon{width:32px;height:32px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border-radius:8px;}
+  
+  .progress-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:10px;}
+  .progress-fill{height:100%;background:var(--green-mid);transition:width .3s;}
+  .progress-fill.over{background:var(--red-mid);}
 
-  .entries{margin-top:8px;border-top:.5px solid var(--border);padding-top:8px;}
-  .entry-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;gap:8px;}
-  .entry-desc{font-size:12px;color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .entry-amount{font-size:13px;font-weight:500;}
-  .entry-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 0 0 4px;}
-  .add-form{margin-top:8px;display:flex;gap:6px;align-items:center;}
-  .add-form input{font-family:inherit;font-size:13px;padding:6px 9px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);outline:none;}
-  .add-form button{padding:6px 12px;font-size:13px;font-family:inherit;font-weight:500;border:none;border-radius:var(--radius-sm);background:var(--accent);color:var(--bg);cursor:pointer;}
+  .entry-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-top:.5px solid var(--border);}
+  .add-form{display:flex;gap:5px;margin-top:10px;}
+  .add-form input{flex:1;padding:6px;border:.5px solid var(--border2);border-radius:4px;background:var(--surface2);font-size:13px;}
+  .add-form button{padding:6px 12px;background:var(--accent);color:var(--bg);border:none;border-radius:4px;font-size:13px;}
 
-  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
-  .modal{background:var(--surface);border-radius:20px 20px 0 0;padding:1.25rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;}
-  .modal-handle{width:36px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem;}
-  .modal-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--border);gap:12px;}
-  .modal-row input{width:90px;font-family:inherit;font-size:14px;padding:5px 8px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);text-align:right;}
-  .modal-close{width:100%;margin-top:1rem;padding:13px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;z-index:100;}
+  .modal{background:var(--surface);width:100%;padding:1.5rem;border-radius:20px 20px 0 0;}
+  .modal-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--border);}
+  .modal-row input{width:80px;padding:5px;text-align:right;}
 </style>
 </head>
 <body>
 
-<div id="loading-screen" class="loading">
-  <div class="spinner"></div>
-  <span>Conectando con Firebase...</span>
-</div>
+<div id="loading" class="loading"><div class="spinner"></div><span>Cargando datos...</span></div>
 
-<div id="setup-screen" class="fullpage" style="display:none">
+<div id="setup" class="setup-page" style="display:none">
   <div class="card">
-    <h1>Configuración</h1>
-    <p class="sub">Vincule su proyecto de Firebase para sincronizar sus datos.</p>
-    <div class="field"><label>API Key</label><input id="cfg-apikey" type="text" /></div>
-    <div class="field"><label>Database URL</label><input id="cfg-dburl" type="text" /></div>
-    <div class="field"><label>Project ID</label><input id="cfg-project" type="text" /></div>
-    <div class="err-msg" id="setup-error">Por favor, rellene todos los campos.</div>
-    <button class="btn-primary" onclick="saveFirebaseConfig()">Guardar y Conectar</button>
+    <h2 style="margin-bottom:1rem">Configuración Firebase</h2>
+    <div class="field"><label>API Key</label><input id="c-key" type="text" /></div>
+    <div class="field"><label>Database URL</label><input id="c-url" type="text" /></div>
+    <div class="field"><label>Project ID</label><input id="c-id" type="text" /></div>
+    <button class="btn-primary" onclick="saveCfg()">Conectar</button>
   </div>
 </div>
 
-<div id="login-screen" class="fullpage" style="display:none">
-  <div class="card login-card">
-    <div class="login-icon">💰</div>
-    <h1>Mis Finanzas</h1>
-    <p>Acceda de forma segura con su cuenta de Google.</p>
-    <button class="google-btn" onclick="signInWithGoogle()">
-      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-      Iniciar Sesión
-    </button>
-  </div>
-</div>
-
-<div id="main-app" style="display:none">
+<div id="app" style="display:none">
   <div class="app">
     <div class="header">
       <div class="header-top">
-        <div>
-          <h1>Mis Finanzas</h1>
-          <div class="header-month" id="header-month">--</div>
-        </div>
-        <div class="sync-dot online" id="sync-indicator"><span class="dot"></span><span id="sync-text">Sincronizado</span></div>
+        <h1 id="h-month" style="font-size:18px">Cargando...</h1>
+        <div class="sync-dot online"><span class="dot"></span> Sincronizado</div>
       </div>
-      <div class="header-actions">
-        <button class="cfg-btn" onclick="openConfig()">⚙ Presupuestos</button>
-        <button class="cfg-btn" onclick="doSignOut()" style="margin-left:auto; opacity:0.6">Salir</button>
-      </div>
+      <button onclick="openBudgets()" style="font-size:12px; background:none; border:1px solid var(--border2); padding:4px 8px; border-radius:4px; cursor:pointer; color:var(--text2)">⚙ Presupuestos</button>
     </div>
-    <div class="month-tabs" id="month-tabs"></div>
-    <div class="content" id="content"></div>
+    <div class="month-tabs" id="tabs"></div>
+    <div class="content" id="main-content"></div>
   </div>
 </div>
 
-<div class="modal-bg" id="cfg-modal" style="display:none" onclick="handleModalBgClick(event)">
+<div id="modal" class="modal-bg" style="display:none" onclick="this.style.display='none'">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h2>Presupuestos</h2>
-    <div id="modal-rows"></div>
-    <button class="modal-close" onclick="closeConfig()">Guardar</button>
+    <h3 style="margin-bottom:1rem">Editar Presupuestos</h3>
+    <div id="modal-list"></div>
+    <button class="btn-primary" style="margin-top:1rem" onclick="saveBudgets()">Cerrar y Guardar</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithRedirect, 
-  getRedirectResult, 
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence,
-  signOut as fbSignOut
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-const AUTHORIZED_EMAIL = 'vfernandezgo@gmail.com';
-const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-const CATEGORIES = [
-  {id:'comidas',   name:'Comidas fuera', icon:'🍽', type:'gasto'},
-  {id:'compras',   name:'Compras', icon:'🛍', type:'gasto'},
-  {id:'varios',    name:'Gastos varios', icon:'💡', type:'gasto'},
-  {id:'super',     name:'Supermercado', icon:'🛒', type:'gasto'},
-  {id:'regalos',   name:'Regalos', icon:'🎁', type:'gasto'},
-  {id:'ingles',    name:'Inglés', icon:'📚', type:'gasto'},
-  {id:'limpieza',  name:'Limpieza', icon:'🧹', type:'gasto'},
-  {id:'peluqueria',name:'Peluquería', icon:'✂️', type:'gasto'},
-  {id:'costura',   name:'Costura', icon:'🪡', type:'gasto'},
-  {id:'yoga',      name:'Yoga', icon:'🧘', type:'gasto'},
-  {id:'gasolina',  name:'Gasolina', icon:'⛽', type:'gasto'},
-  {id:'viajes',    name:'Viajes', icon:'✈️', type:'gasto'},
-  {id:'ingresos',  name:'Ingresos extra', icon:'💰', type:'ingreso'},
+const CATS = [
+  {id:'comidas',n:'Comidas',i:'🍽',t:'gasto'},{id:'super',n:'Super',i:'🛒',t:'gasto'},
+  {id:'compras',n:'Compras',i:'🛍',t:'gasto'},{id:'varios',n:'Varios',i:'💡',t:'gasto'},
+  {id:'gasolina',n:'Gasolina',i:'⛽',t:'gasto'},{id:'viajes',n:'Viajes',i:'✈️',t:'gasto'},
+  {id:'ingresos',n:'Ingresos Extra',i:'💰',t:'ingreso'}
 ];
+const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-const DEFAULT_BUDGETS = {
-  comidas:200,compras:150,varios:100,super:300,regalos:100,
-  ingles:80,limpieza:120,peluqueria:60,costura:50,yoga:60,
-  gasolina:100,viajes:300
-};
+let db, curM = new Date().getMonth(), curY = new Date().getFullYear();
+let data = {}, budgets = {};
 
-let auth, db;
-let selectedMonth = new Date().getMonth();
-let selectedYear = new Date().getFullYear();
-let monthDataCache = {};
-let budgetsCache = {...DEFAULT_BUDGETS};
-let openForms = {};
-let unsubMonth, unsubBudgets;
-
-function monthKey(y,m){ return `${y}_${String(m+1).padStart(2,'0')}`; }
-function budgetsPath(y,m){ return `presupuestos/${monthKey(y,m)}`; }
-function dataPath(y,m){ return `datos/${monthKey(y,m)}`; }
-
-function show(id) {
-  ['loading-screen','setup-screen','login-screen','main-app'].forEach(s => {
-    const el = document.getElementById(s);
-    if(el) el.style.display = (s === id) ? (id==='main-app'?'block':'flex') : 'none';
-  });
-}
-
-function setSyncStatus(s){
-  const ind = document.getElementById('sync-indicator');
-  const txt = document.getElementById('sync-text');
-  if(ind) ind.className='sync-dot '+s;
-  if(txt) txt.textContent=s==='online'?'Sincronizado':s==='syncing'?'Guardando...':'Error';
-}
-
-window.saveFirebaseConfig = function() {
-  const cfg = {
-    apiKey: document.getElementById('cfg-apikey').value.trim(),
-    databaseURL: document.getElementById('cfg-dburl').value.trim(),
-    projectId: document.getElementById('cfg-project').value.trim()
-  };
-  if(cfg.apiKey && cfg.databaseURL && cfg.projectId) {
-    localStorage.setItem('fin_firebase_cfg', JSON.stringify(cfg));
-    location.reload();
-  } else {
-    document.getElementById('setup-error').style.display = 'block';
-  }
+window.saveCfg = () => {
+  const cfg = { apiKey:document.getElementById('c-key').value, databaseURL:document.getElementById('c-url').value, projectId:document.getElementById('c-id').value };
+  localStorage.setItem('f_cfg', JSON.stringify(cfg));
+  location.reload();
 };
 
 async function init() {
-  const cfgStr = localStorage.getItem('fin_firebase_cfg');
-  if(!cfgStr) { show('setup-screen'); return; }
+  const cfgS = localStorage.getItem('f_cfg');
+  if(!cfgS) { document.getElementById('loading').style.display='none'; document.getElementById('setup').style.display='flex'; return; }
   
-  const cfg = JSON.parse(cfgStr);
-  try {
-    const app = initializeApp({
-      apiKey: cfg.apiKey,
-      databaseURL: cfg.databaseURL,
-      projectId: cfg.projectId,
-      authDomain: "mis-finanzas-81ac4.firebaseapp.com"
-    });
+  const cfg = JSON.parse(cfgS);
+  const app = initializeApp(cfg);
+  db = getDatabase(app);
 
-    auth = getAuth(app);
-    db = getDatabase(app);
+  onValue(ref(db, `datos/${curY}_${curM+1}`), s => { data = s.val() || {}; render(); });
+  onValue(ref(db, `budgets/${curY}_${curM+1}`), s => { budgets = s.val() || {}; render(); });
+  
+  document.getElementById('loading').style.display='none';
+  document.getElementById('app').style.display='block';
+}
 
-    await setPersistence(auth, browserLocalPersistence);
+function render() {
+  const t = document.getElementById('tabs'); t.innerHTML = '';
+  MONTHS.forEach((m,i) => {
+    const b = document.createElement('button'); b.className = `tab ${i===curM?'active':''}`;
+    b.textContent = m; b.onclick = () => { curM=i; init(); };
+    t.appendChild(b);
+  });
+
+  document.getElementById('h-month').textContent = `${MONTHS[curM]} ${curY}`;
+  
+  let totalG = 0;
+  CATS.filter(c=>c.t==='gasto').forEach(c => { (data[c.id]||[]).forEach(e => totalG += e.a); });
+
+  let h = `<div class="summary-grid">
+    <div class="summary-card"><div class="s-label">Gastado</div><div class="s-value">${totalG} €</div></div>
+    <div class="summary-card"><div class="s-label">Estado</div><div class="s-value">Activo</div></div>
+  </div>`;
+
+  CATS.forEach(c => {
+    const spent = (data[c.id]||[]).reduce((a,b)=>a+b.a, 0);
+    const bgt = budgets[c.id] || 0;
+    const pct = bgt > 0 ? Math.min((spent/bgt)*100, 100) : 0;
     
-    try {
-      await getRedirectResult(auth);
-    } catch (e) {
-      console.error("Error redirect:", e);
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (user.email === AUTHORIZED_EMAIL) {
-          show('main-app');
-          subscribeMonth();
-          subscribeBudgets();
-        } else {
-          alert("Acceso no autorizado");
-          fbSignOut(auth);
-        }
-      } else {
-        show('login-screen');
-      }
-    });
-  } catch(e) {
-    console.error("Error init:", e);
-    show('setup-screen');
-  }
-}
-
-window.signInWithGoogle = function() {
-  const provider = new GoogleAuthProvider();
-  signInWithRedirect(auth, provider);
-};
-
-window.doSignOut = function() {
-  if(confirm('¿Cerrar sesión?')) fbSignOut(auth);
-};
-
-function subscribeMonth(){
-  if(unsubMonth) unsubMonth();
-  unsubMonth = onValue(ref(db, dataPath(selectedYear, selectedMonth)), snap => {
-    monthDataCache = snap.val() || {};
-    render();
-  });
-}
-
-function subscribeBudgets(){
-  if(unsubBudgets) unsubBudgets();
-  unsubBudgets = onValue(ref(db, budgetsPath(selectedYear, selectedMonth)), snap => {
-    budgetsCache = snap.val() ? {...DEFAULT_BUDGETS, ...snap.val()} : {...DEFAULT_BUDGETS};
-    render();
-  });
-}
-
-function formatEur(n){ return (n||0).toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
-function totalSpent(catId){ return (monthDataCache[catId]||[]).reduce((s,e)=>s+(e.amount||0),0); }
-
-function render(){
-  const tabs = document.getElementById('month-tabs');
-  if(!tabs) return;
-  tabs.innerHTML = '';
-  MESES.forEach((m,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (i===selectedMonth ? ' active' : '');
-    btn.textContent = m;
-    btn.onclick = () => { selectedMonth = i; subscribeMonth(); subscribeBudgets(); };
-    tabs.appendChild(btn);
-  });
-
-  document.getElementById('header-month').textContent = MESES_FULL[selectedMonth] + ' ' + selectedYear;
-  
-  const gastos = CATEGORIES.filter(c=>c.type==='gasto');
-  const ingresos = CATEGORIES.filter(c=>c.type==='ingreso');
-  let totalG = 0; gastos.forEach(c => totalG += totalSpent(c.id));
-  let totalI = 0; ingresos.forEach(c => totalI += totalSpent(c.id));
-  const presTotal = gastos.reduce((s,c) => s + (budgetsCache[c.id]||0), 0);
-  const restante = presTotal - totalG;
-
-  let html = `
-    <div class="summary-grid">
-      <div class="summary-card"><div class="s-label">Gastado</div><div class="s-value" style="color:var(--red-mid)">${formatEur(totalG)}</div></div>
-      <div class="summary-card"><div class="s-label">Restante</div><div class="s-value" style="color:${restante<0?'var(--red-mid)':'var(--green-mid)'}">${formatEur(restante)}</div></div>
-      <div class="summary-card full income-card"><div class="s-label">Ingresos extra</div><div class="s-value">${formatEur(totalI)}</div></div>
-    </div>
-    <div class="section-title">Categorías</div>`;
-
-  gastos.forEach(cat => {
-    const spent = totalSpent(cat.id);
-    const budget = budgetsCache[cat.id]||0;
-    const pct = budget > 0 ? Math.min((spent/budget)*100, 100) : 0;
-    const isOver = spent > budget && budget > 0;
-    html += `
-      <div class="cat-card ${isOver?'over':''}">
-        <div class="cat-header">
-          <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
-          <div class="cat-amounts"><b>${formatEur(spent)}</b> / <small>${formatEur(budget)}</small></div>
-        </div>
-        <div class="progress-bar"><div class="progress-fill ${isOver?'p-over':'p-ok'}" style="width:${pct}%"></div></div>
-        <div class="cat-footer">
-            <span class="cat-remaining">${isOver?'Excedido':'Queda'} ${formatEur(Math.abs(budget-spent))}</span>
-            <button class="add-btn" onclick="toggleForm('${cat.id}')">${openForms[cat.id]?'Cerrar':'+ Añadir'}</button>
-        </div>
-        ${renderEntries(cat.id, monthDataCache[cat.id]||[])}
-      </div>`;
-  });
-
-  html += `<div class="section-title">Ingresos</div>`;
-  ingresos.forEach(cat => {
-    html += `
-    <div class="cat-card income-card">
-        <div class="cat-header">
-          <div class="cat-left"><div class="cat-icon">${cat.icon}</div><span class="cat-name">${cat.name}</span></div>
-          <div class="cat-amounts"><b>${formatEur(totalSpent(cat.id))}</b></div>
-        </div>
-        <div class="cat-footer"><span></span><button class="add-btn" onclick="toggleForm('${cat.id}')">${openForms[cat.id]?'Cerrar':'+ Añadir'}</button></div>
-        ${renderEntries(cat.id, monthDataCache[cat.id]||[])}
+    h += `<div class="cat-card">
+      <div class="cat-header">
+        <div class="cat-info"><div class="cat-icon">${c.i}</div><b>${c.n}</b></div>
+        <div>${spent}${c.t==='gasto'?' / '+bgt:''} €</div>
+      </div>
+      ${c.t==='gasto' ? `<div class="progress-bar"><div class="progress-fill ${spent>bgt?'over':''}" style="width:${pct}%"></div></div>` : ''}
+      <div id="list-${c.id}">
+        ${(data[c.id]||[]).map((e,idx) => `
+          <div class="entry-row"><span>${e.d}</span><span>${e.a} € <button onclick="del('${c.id}',${idx})" style="background:none; border:none; color:var(--red); margin-left:5px">×</button></span></div>
+        `).join('')}
+      </div>
+      <div class="add-form">
+        <input id="d-${c.id}" placeholder="Concepto" />
+        <input id="a-${c.id}" type="number" placeholder="€" style="width:60px" />
+        <button onclick="add('${c.id}')">Add</button>
+      </div>
     </div>`;
   });
-  document.getElementById('content').innerHTML = html;
+  document.getElementById('main-content').innerHTML = h;
 }
 
-function renderEntries(catId, entries){
-  if(!openForms[catId] && entries.length === 0) return '';
-  let h = '<div class="entries">';
-  entries.forEach((e, idx) => {
-    h += `<div class="entry-row">
-      <span class="entry-desc">${e.desc}</span>
-      <span class="entry-amount">${formatEur(e.amount)}</span>
-      <button class="entry-del" onclick="deleteEntry('${catId}', ${idx})">×</button>
-    </div>`;
-  });
-  if(openForms[catId]){
-    h += `<div class="add-form">
-      <input type="text" id="in-desc-${catId}" placeholder="Cosa" style="flex:2" />
-      <input type="number" id="in-amt-${catId}" placeholder="€" style="flex:1" />
-      <button onclick="addEntry('${catId}')">OK</button>
-    </div>`;
-  }
-  return h + '</div>';
-}
-
-window.toggleForm = (id) => { openForms[id] = !openForms[id]; render(); };
-
-window.addEntry = async (catId) => {
-  const desc = document.getElementById(`in-desc-${catId}`).value || 'Gasto';
-  const amount = parseFloat(document.getElementById(`in-amt-${catId}`).value);
-  if(!amount) return;
-  setSyncStatus('syncing');
-  const newData = {...monthDataCache};
-  if(!newData[catId]) newData[catId] = [];
-  newData[catId].push({desc, amount, date: new Date().toISOString()});
-  await set(ref(db, dataPath(selectedYear, selectedMonth)), newData);
-  openForms[catId] = false;
-  setSyncStatus('online');
+window.add = (id) => {
+  const dInput = document.getElementById(`d-${id}`), aInput = document.getElementById(`a-${id}`);
+  const d = dInput.value || 'Gasto', a = parseFloat(aInput.value);
+  if(!a) return;
+  const list = data[id] || [];
+  list.push({d, a});
+  set(ref(db, `datos/${curY}_${curM+1}/${id}`), list);
 };
 
-window.deleteEntry = async (catId, idx) => {
-  if(!confirm('¿Eliminar?')) return;
-  const newData = {...monthDataCache};
-  newData[catId].splice(idx, 1);
-  await set(ref(db, dataPath(selectedYear, selectedMonth)), newData);
+window.del = (id, idx) => {
+  const list = data[id];
+  list.splice(idx, 1);
+  set(ref(db, `datos/${curY}_${curM+1}/${id}`), list);
 };
 
-window.openConfig = () => {
-    let h = '';
-    CATEGORIES.filter(c=>c.type==='gasto').forEach(cat => {
-        h += `<div class="modal-row">
-            <div class="modal-label">${cat.icon} ${cat.name}</div>
-            <input type="number" id="cfg-val-${cat.id}" value="${budgetsCache[cat.id]||0}" />
-        </div>`;
-    });
-    document.getElementById('modal-rows').innerHTML = h;
-    document.getElementById('cfg-modal').style.display = 'flex';
+window.openBudgets = () => {
+  const list = document.getElementById('modal-list');
+  list.innerHTML = CATS.filter(c=>c.t==='gasto').map(c => `
+    <div class="modal-row"><span>${c.i} ${c.n}</span><input id="b-${c.id}" type="number" value="${budgets[c.id]||0}" /></div>
+  `).join('');
+  document.getElementById('modal').style.display='flex';
 };
 
-window.closeConfig = async () => {
-    const newBudgets = {};
-    CATEGORIES.filter(c=>c.type==='gasto').forEach(cat => {
-        newBudgets[cat.id] = parseFloat(document.getElementById(`cfg-val-${cat.id}`).value) || 0;
-    });
-    await set(ref(db, budgetsPath(selectedYear, selectedMonth)), newBudgets);
-    document.getElementById('cfg-modal').style.display = 'none';
+window.saveBudgets = () => {
+  const newB = {};
+  CATS.filter(c=>c.t==='gasto').forEach(c => { newB[c.id] = parseFloat(document.getElementById(`b-${c.id}`).value)||0; });
+  set(ref(db, `budgets/${curY}_${curM+1}`), newB);
+  document.getElementById('modal').style.display='none';
 };
-
-window.handleModalBgClick = (e) => { if(e.target.id === 'cfg-modal') document.getElementById('cfg-modal').style.display = 'none'; };
 
 init();
 </script>
