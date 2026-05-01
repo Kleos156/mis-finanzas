@@ -291,29 +291,23 @@ async function init(){
       apiKey: cfg.apiKey,
       databaseURL: cfg.databaseURL,
       projectId: cfg.projectId,
-      // IMPORTANTE: Dominio fijo para evitar bloqueos en Safari/Android
       authDomain: 'mis-finanzas-81ac4.firebaseapp.com', 
     });
 
     db = getDatabase(app);
     auth = getAuth(app);
 
-    // [VITAL PARA MÓVILES] Captura el resultado al volver de Google
-    getRedirectResult(auth).catch(e => {
+    // Captura el resultado al volver de Google (Corregido)
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) console.log("Login tras redirección exitoso");
+      })
+      .catch((e) => {
         console.error("Error al volver de la redirección:", e);
         const errEl = document.getElementById('login-error');
         if(errEl) {
             errEl.textContent = 'Error: ' + e.message;
             errEl.style.display = 'block';
-        }
-    });
-      .catch((error) => {
-        console.error("Error en redirección:", error.code);
-        // Si sale un error aquí, lo veremos en el botón rojo de la web
-        const errEl = document.getElementById('login-error');
-        if(errEl) {
-          errEl.textContent = 'Error: ' + error.message;
-          errEl.style.display = 'block';
         }
       });
 
@@ -323,19 +317,30 @@ async function init(){
       } else if(user.email !== AUTHORIZED_EMAIL){
         fbSignOut(auth); 
         show('login-screen');
-        document.getElementById('login-error').style.display = 'block';
-        document.getElementById('login-error').textContent = 'Acceso denegado: email no autorizado.';
+        const errEl = document.getElementById('login-error');
+        if(errEl) {
+          errEl.style.display = 'block';
+          errEl.textContent = 'Acceso denegado: email no autorizado.';
+        }
       } else {
         show('main-app'); 
         setSyncStatus('online');
-        subscribeMonth(); 
-        subscribeBudgets();
+        // Usamos try/catch aquí para que si falla la base de datos no se bloquee la app
+        try {
+          subscribeMonth(); 
+          subscribeBudgets();
+        } catch(err) {
+          console.error("Error al suscribir datos:", err);
+        }
       }
     });
   } catch(e){
     show('setup-screen');
-    document.getElementById('setup-error').textContent = 'Error: ' + e.message;
-    document.getElementById('setup-error').style.display = 'block';
+    const setupErr = document.getElementById('setup-error');
+    if(setupErr) {
+      setupErr.textContent = 'Error: ' + e.message;
+      setupErr.style.display = 'block';
+    }
   }
 }
 
@@ -344,10 +349,11 @@ window.signInWithGoogle = function() {
   if(errEl) errEl.style.display = 'none';
   
   const provider = new GoogleAuthProvider();
-  // Forzar la selección de cuenta ayuda a que el móvil no se quede "atascado" con una sesión vieja
+  // Esto obliga a seleccionar cuenta, evitando que el móvil use una sesión fallida guardada
   provider.setCustomParameters({ prompt: 'select_account' });
   
-  // IMPORTANTE: Sin async y sin await. Solo lanzamos la orden.
+  // IMPORTANTE: Sin 'async' al principio y sin 'await' aquí.
+  // Solo lanzamos la redirección.
   signInWithRedirect(auth, provider);
 };
 
