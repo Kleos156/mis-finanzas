@@ -742,7 +742,8 @@ async function doSignIn() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile) {
     btn.textContent = 'Redirigiendo...';
-    await signInWithRedirect(auth, provider);
+    signInWithRedirect(auth, provider);
+    return;
   } else {
     btn.textContent = 'Abriendo Google...';
     try {
