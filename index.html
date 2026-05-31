@@ -534,6 +534,26 @@
   </div>
 </div>
 
+<div id="login-screen" class="setup-screen" style="display:none">
+  <div class="setup-card">
+    <h1>Mis Finanzas</h1>
+    <p class="subtitle">Introduce tus credenciales para acceder.</p>
+    <div class="setup-field">
+      <label>Email</label>
+      <input id="login-email" type="email" placeholder="tu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doSignIn()" />
+    </div>
+    <div class="setup-field">
+      <label>Contraseña</label>
+      <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()" />
+    </div>
+    <div class="setup-error" id="login-error">Email o contraseña incorrectos.</div>
+    <button class="setup-btn" id="login-btn" onclick="doSignIn()">Entrar</button>
+    <p style="text-align:center;margin-top:1rem;font-size:11px;color:var(--text3)">
+      <span style="cursor:pointer;text-decoration:underline" onclick="resetFirebaseConfig()">Cambiar configuración Firebase</span>
+    </p>
+  </div>
+</div>
+
 <div id="main-app" style="display:none">
   <div class="app">
     <div class="header">
@@ -553,7 +573,7 @@
         <button class="cfg-btn" onclick="openConfig()">⚙ Presupuestos</button>
         <button class="cfg-btn" onclick="openCatConfig()">✏ Categorías</button>
         <button class="cfg-btn" onclick="openExport()">📥 Exportar</button>
-        <button class="cfg-btn" onclick="resetFirebaseConfig()" style="margin-left:auto;font-size:11px;opacity:0.6;">Desconectar</button>
+        <button class="cfg-btn" onclick="doSignOut()" style="margin-left:auto;font-size:11px;opacity:0.6;">Cerrar sesión</button>
       </div>
     </div>
     <div class="month-tabs" id="month-tabs"></div>
@@ -620,6 +640,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 // ============================================================
 //  CONFIGURACIÓN FIREBASE — PEGA AQUÍ TUS VALORES
@@ -675,6 +696,7 @@ let unsubscribeMonth = null;
 let unsubscribeBudgets = null;
 let unsubscribeCategories = null;
 let editingCategories = [];
+let auth = null;
 
 // ---- Firebase init ----
 function getFirebaseConfig() {
@@ -705,6 +727,29 @@ function resetFirebaseConfig() {
 }
 window.resetFirebaseConfig = resetFirebaseConfig;
 
+async function doSignIn() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+window.doSignIn = doSignIn;
+
+async function doSignOut() {
+  try { await signOut(auth); } catch(e) {}
+}
+window.doSignOut = doSignOut;
+
 async function initFirebase() {
   const cfg = getFirebaseConfig();
   if (!cfg) {
@@ -720,13 +765,23 @@ async function initFirebase() {
       authDomain: cfg.projectId + '.firebaseapp.com',
     });
     db = getDatabase(app);
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-    setSyncStatus('online');
-    subscribeCategories();
-    subscribeMonth();
-    subscribeBudgets();
-    populateExportYear();
+    auth = getAuth(app);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        setSyncStatus('online');
+        subscribeCategories();
+        subscribeMonth();
+        subscribeBudgets();
+        populateExportYear();
+      } else {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+      }
+    });
   } catch(e) {
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('setup-screen').style.display = 'flex';
