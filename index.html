@@ -737,24 +737,20 @@ async function doSignIn() {
   const btn = document.getElementById('login-btn');
   errEl.style.display = 'none';
   btn.disabled = true;
+  btn.textContent = 'Conectando...';
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ login_hint: 'vfernandezgo@gmail.com' });
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    btn.textContent = 'Redirigiendo...';
-    signInWithRedirect(auth, provider);
-    return;
-  } else {
-    btn.textContent = 'Abriendo Google...';
-    try {
-      await signInWithPopup(auth, provider);
-    } catch(e) {
-      if (e.code !== 'auth/popup-closed-by-user') {
-        errEl.textContent = 'Error al iniciar sesión. Inténtalo de nuevo.';
-        errEl.style.display = 'block';
-      }
-      btn.disabled = false;
-      btn.textContent = 'Continuar con Google';
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Continuar con Google';
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      btn.textContent = 'Redirigiendo a Google...';
+      signInWithRedirect(auth, provider);
+    } else if (e.code !== 'auth/popup-closed-by-user') {
+      errEl.textContent = 'Error: ' + e.code;
+      errEl.style.display = 'block';
     }
   }
 }
