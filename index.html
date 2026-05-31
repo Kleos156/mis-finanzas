@@ -766,8 +766,15 @@ async function initFirebase() {
     });
     db = getDatabase(app);
     auth = getAuth(app);
+    const ALLOWED_EMAIL = 'vfernandezgo@gmail.com';
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        if (user.email !== ALLOWED_EMAIL) {
+          signOut(auth);
+          document.getElementById('login-error').textContent = 'Esta cuenta no tiene permiso de acceso.';
+          document.getElementById('login-error').style.display = 'block';
+          return;
+        }
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
