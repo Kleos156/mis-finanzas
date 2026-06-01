@@ -858,7 +858,9 @@ function setSyncStatus(status, text) {
 
 // ---- Paths ----
 function monthPath(y, m) { return `datos/${y}_${String(m+1).padStart(2,'0')}`; }
-function budgetsPath() { return 'presupuestos'; }
+function budgetsPath() {
+  return `presupuestos/${selectedYear}_${String(selectedMonth+1).padStart(2,'0')}`;
+}
 function categoriesPath() { return 'categorias'; }
 
 // ---- Subscriptions ----
@@ -933,8 +935,9 @@ function renderTabs() {
     btn.onclick = () => {
       selectedMonth = i;
       openForms = {};
-      allYearData = null; // reset so evolution reloads
+      allYearData = null;
       subscribeMonth();
+      subscribeBudgets();
       renderTabs();
       document.getElementById('header-month').textContent = MESES_FULL[selectedMonth] + ' ' + selectedYear;
     };
@@ -1424,6 +1427,8 @@ function attachListeners() {
 
 // ---- Budget modal ----
 function openConfig() {
+  document.querySelector('#cfg-modal h2').textContent =
+    `Presupuesto — ${MESES_FULL[selectedMonth]} ${selectedYear}`;
   const rows = document.getElementById('modal-rows');
   let html = '';
   categoriesCache.filter(c => c.type === 'gasto').forEach(cat => {
@@ -1438,7 +1443,7 @@ function openConfig() {
 window.openConfig = openConfig;
 
 async function closeConfig() {
-  const newBudgets = {...budgetsCache};
+  const newBudgets = {};
   categoriesCache.filter(c => c.type === 'gasto').forEach(cat => {
     const inp = document.getElementById('cfg-'+cat.id);
     if (inp) newBudgets[cat.id] = parseFloat(inp.value) || 0;
