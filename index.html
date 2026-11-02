@@ -132,6 +132,7 @@
   }
   .tab.active { background: var(--accent); color: var(--bg); border-color: transparent; }
   .tab.has-data { color: var(--text); }
+  .tab.year-nav { color: var(--text3); border-style: dashed; }
 
   /* ---- CONTENT ---- */
   .content { padding: 1rem 1.25rem 6rem; }
@@ -925,24 +926,37 @@ function today() {
 }
 
 // ---- Tabs ----
+function selectMonth(year, month) {
+  selectedYear = year;
+  selectedMonth = month;
+  openForms = {};
+  allYearData = null;
+  subscribeMonth();
+  subscribeBudgets();
+  renderTabs();
+  document.getElementById('header-month').textContent = MESES_FULL[selectedMonth] + ' ' + selectedYear;
+}
+
 function renderTabs() {
   const container = document.getElementById('month-tabs');
   container.innerHTML = '';
+  const prevYear = document.createElement('button');
+  prevYear.className = 'tab year-nav';
+  prevYear.textContent = '‹ ' + (selectedYear - 1);
+  prevYear.onclick = () => selectMonth(selectedYear - 1, 11);
+  container.appendChild(prevYear);
   MESES.forEach((m, i) => {
     const btn = document.createElement('button');
     btn.className = 'tab' + (i === selectedMonth ? ' active' : '');
     btn.textContent = m;
-    btn.onclick = () => {
-      selectedMonth = i;
-      openForms = {};
-      allYearData = null;
-      subscribeMonth();
-      subscribeBudgets();
-      renderTabs();
-      document.getElementById('header-month').textContent = MESES_FULL[selectedMonth] + ' ' + selectedYear;
-    };
+    btn.onclick = () => selectMonth(selectedYear, i);
     container.appendChild(btn);
   });
+  const nextYear = document.createElement('button');
+  nextYear.className = 'tab year-nav';
+  nextYear.textContent = (selectedYear + 1) + ' ›';
+  nextYear.onclick = () => selectMonth(selectedYear + 1, 0);
+  container.appendChild(nextYear);
   setTimeout(() => {
     const active = container.querySelector('.tab.active');
     if (active) active.scrollIntoView({inline:'center', behavior:'smooth'});
@@ -1528,16 +1542,19 @@ window.handleCatModalBgClick = handleCatModalBgClick;
 function populateExportYear() {
   const sel = document.getElementById('exp-year');
   if (!sel) return;
-  const y = new Date().getFullYear();
-  for (let i = y; i >= y - 2; i--) {
+  sel.innerHTML = '';
+  const newest = Math.max(new Date().getFullYear(), selectedYear);
+  const oldest = Math.min(2026, selectedYear);
+  for (let i = newest; i >= oldest; i--) {
     const opt = document.createElement('option');
     opt.value = i; opt.textContent = i;
-    if (i === y) opt.selected = true;
+    if (i === selectedYear) opt.selected = true;
     sel.appendChild(opt);
   }
 }
 
 function openExport() {
+  populateExportYear();
   document.getElementById('exp-month').value = String(selectedMonth + 1).padStart(2,'0');
   document.getElementById('export-modal').style.display = 'flex';
 }
