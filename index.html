@@ -652,7 +652,8 @@
       </select>
     </div>
     <p class="export-note">Se exportarán todos los apuntes del periodo seleccionado, incluyendo ingresos.</p>
-    <button class="modal-close" onclick="doExport()">⬇ Descargar Excel</button>
+    <button class="modal-close" onclick="doExport()">⬇ Descargar periodo seleccionado</button>
+    <button class="modal-close" onclick="doExport(true)" style="margin-top:8px;">⬇ Descargar todo el historial</button>
     <button onclick="document.getElementById('export-modal').style.display='none'" style="width:100%;padding:10px;margin-top:8px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;font-family:inherit;cursor:pointer;color:var(--text2);">Cancelar</button>
   </div>
 </div>
@@ -1566,60 +1567,88 @@ function handleExportModalBgClick(e) {
 }
 window.handleExportModalBgClick = handleExportModalBgClick;
 
-async function doExport() {
-  const year = parseInt(document.getElementById('exp-year').value);
+function asList(v) {
+  if (!v) return [];
+  return Array.isArray(v) ? v.filter(Boolean) : Object.values(v).filter(Boolean);
+}
+
+async function doExport(everything = false) {
+  if (typeof XLSX === 'undefined') {
+    alert('La librería de Excel no está disponible. Comprueba tu conexión a internet.');
+    return;
+  }
+  const year = document.getElementById('exp-year').value;
   const month = document.getElementById('exp-month').value;
 
   setSyncStatus('syncing');
-  let exportData;
+  let exportData, budgetsData;
   try {
-    const snap = await get(ref(db, 'datos'));
-    exportData = snap.val() || {};
+    const [snapDatos, snapBudgets] = await Promise.all([
+      get(ref(db, 'datos')), get(ref(db, 'presupuestos'))
+    ]);
+    exportData = snapDatos.val() || {};
+    budgetsData = snapBudgets.val() || {};
     setSyncStatus('online');
   } catch(e) {
     setSyncStatus('error', 'Error al cargar');
     return;
   }
 
-  const monthsToExport = month === 'all'
-    ? Array.from({length:12}, (_,i) => String(i+1).padStart(2,'0'))
-    : [month];
+  const allKeys = Object.keys(exportData).filter(k => /^\d{4}_\d{2}$/.test(k)).sort();
+  const keys = everything ? allKeys
+    : month === 'all' ? allKeys.filter(k => k.startsWith(year + '_'))
+    : [`${year}_${month}`];
 
-  const rows = [['Fecha', 'Categoría', 'Tipo', 'Descripción', 'Importe (€)', 'Destacado']];
+  const catById = Object.fromEntries(categoriesCache.map(c => [c.id, c]));
+  const gastosCats = categoriesCache.filter(c => c.type === 'gasto');
 
-  monthsToExport.forEach(m => {
-    const key = `${year}_${m}`;
+  const rows = [['Año', 'Mes', 'Fecha', 'Categoría', 'Tipo', 'Descripción', 'Importe (€)', 'Destacado']];
+  const summary = [['Año', 'Mes', 'Ingresos (€)', 'Gastos (€)', 'Presupuesto gastos (€)', 'Margen presupuesto (€)', 'Balance (€)']];
+  const sum = { ing: 0, gas: 0, pres: 0 };
+
+  keys.forEach(key => {
+    const [y, m] = key.split('_');
+    const mesName = MESES_FULL[parseInt(m) - 1];
     const monthData = exportData[key] || {};
-    categoriesCache.forEach(cat => {
-      (monthData[cat.id] || []).forEach(e => {
+    const catIds = [
+      ...categoriesCache.map(c => c.id),
+      ...Object.keys(monthData).filter(id => !catById[id])
+    ];
+    let ing = 0, gas = 0;
+    catIds.forEach(id => {
+      const cat = catById[id];
+      const isIngreso = cat && cat.type === 'ingreso';
+      asList(monthData[id]).forEach(e => {
+        const amount = e.amount || 0;
+        if (isIngreso) ing += amount; else gas += amount;
         rows.push([
-          e.date || '',
-          cat.name,
-          cat.type === 'ingreso' ? 'Ingreso' : 'Gasto',
-          e.desc || '',
-          e.amount || 0,
-          e.highlight ? 'Sí' : ''
+          parseInt(y), mesName, e.date || '',
+          cat ? cat.name : `${id} (borrada)`,
+          isIngreso ? 'Ingreso' : 'Gasto',
+          e.desc || '', amount, e.highlight ? 'Sí' : ''
         ]);
       });
     });
+    const monthBudgets = budgetsData[key] ? {...DEFAULT_BUDGETS, ...budgetsData[key]} : {...DEFAULT_BUDGETS};
+    const pres = gastosCats.reduce((s, c) => s + (parseFloat(monthBudgets[c.id]) || 0), 0);
+    summary.push([parseInt(y), mesName, ing, gas, pres, pres - gas, ing - gas]);
+    sum.ing += ing; sum.gas += gas; sum.pres += pres;
   });
-
-  if (typeof XLSX === 'undefined') {
-    alert('La librería de Excel no está disponible. Comprueba tu conexión a internet.');
-    return;
+  if (keys.length > 1) {
+    summary.push(['TOTAL', '', sum.ing, sum.gas, sum.pres, sum.pres - sum.gas, sum.ing - sum.gas]);
   }
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:7},{wch:22},{wch:8},{wch:36},{wch:12},{wch:10}];
-
   const wb = XLSX.utils.book_new();
-  const sheetName = month === 'all'
-    ? `Finanzas ${year}`
-    : `${MESES_FULL[parseInt(month)-1]} ${year}`.substring(0, 31);
-  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  const wsRows = XLSX.utils.aoa_to_sheet(rows);
+  wsRows['!cols'] = [{wch:6},{wch:11},{wch:7},{wch:22},{wch:8},{wch:36},{wch:12},{wch:10}];
+  wsRows['!autofilter'] = { ref: `A1:H${rows.length}` };
+  XLSX.utils.book_append_sheet(wb, wsRows, 'Apuntes');
+  const wsSummary = XLSX.utils.aoa_to_sheet(summary);
+  wsSummary['!cols'] = [{wch:6},{wch:11},{wch:13},{wch:12},{wch:22},{wch:22},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen mensual');
 
-  const filename = month === 'all'
-    ? `finanzas_${year}.xlsx`
+  const filename = everything ? 'finanzas_completo.xlsx'
+    : month === 'all' ? `finanzas_${year}.xlsx`
     : `finanzas_${year}_${month}.xlsx`;
   XLSX.writeFile(wb, filename);
 
