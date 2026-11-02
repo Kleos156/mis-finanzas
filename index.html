@@ -1602,8 +1602,9 @@ async function doExport(everything = false) {
   const catById = Object.fromEntries(categoriesCache.map(c => [c.id, c]));
   const gastosCats = categoriesCache.filter(c => c.type === 'gasto');
 
-  const rows = [['Año', 'Mes', 'Fecha', 'Categoría', 'Tipo', 'Descripción', 'Importe (€)', 'Destacado']];
-  const summary = [['Año', 'Mes', 'Ingresos (€)', 'Gastos (€)', 'Presupuesto gastos (€)', 'Margen presupuesto (€)', 'Balance (€)']];
+  const r2 = n => Math.round(n * 100) / 100;
+  const rows = [['Año', 'Mes', 'Fecha', 'Categoría', 'Tipo', 'Descripción', 'Importe', 'Destacado']];
+  const summary = [['Año', 'Mes', 'Ingresos extra', 'Gastos', 'Presupuesto gastos', 'Margen presupuesto']];
   const sum = { ing: 0, gas: 0, pres: 0 };
 
   keys.forEach(key => {
@@ -1631,20 +1632,29 @@ async function doExport(everything = false) {
     });
     const monthBudgets = budgetsData[key] ? {...DEFAULT_BUDGETS, ...budgetsData[key]} : {...DEFAULT_BUDGETS};
     const pres = gastosCats.reduce((s, c) => s + (parseFloat(monthBudgets[c.id]) || 0), 0);
-    summary.push([parseInt(y), mesName, ing, gas, pres, pres - gas, ing - gas]);
+    summary.push([parseInt(y), mesName, r2(ing), r2(gas), r2(pres), r2(pres - gas)]);
     sum.ing += ing; sum.gas += gas; sum.pres += pres;
   });
   if (keys.length > 1) {
-    summary.push(['TOTAL', '', sum.ing, sum.gas, sum.pres, sum.pres - sum.gas, sum.ing - sum.gas]);
+    summary.push(['TOTAL', '', r2(sum.ing), r2(sum.gas), r2(sum.pres), r2(sum.pres - sum.gas)]);
   }
+
+  const eurFormat = (ws, cols, nRows) => {
+    for (let r = 1; r < nRows; r++) cols.forEach(c => {
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      if (cell && cell.t === 'n') cell.z = '#,##0.00 "€"';
+    });
+  };
 
   const wb = XLSX.utils.book_new();
   const wsRows = XLSX.utils.aoa_to_sheet(rows);
   wsRows['!cols'] = [{wch:6},{wch:11},{wch:7},{wch:22},{wch:8},{wch:36},{wch:12},{wch:10}];
   wsRows['!autofilter'] = { ref: `A1:H${rows.length}` };
+  eurFormat(wsRows, [6], rows.length);
   XLSX.utils.book_append_sheet(wb, wsRows, 'Apuntes');
   const wsSummary = XLSX.utils.aoa_to_sheet(summary);
-  wsSummary['!cols'] = [{wch:6},{wch:11},{wch:13},{wch:12},{wch:22},{wch:22},{wch:12}];
+  wsSummary['!cols'] = [{wch:6},{wch:11},{wch:15},{wch:13},{wch:19},{wch:19}];
+  eurFormat(wsSummary, [2, 3, 4, 5], summary.length);
   XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen mensual');
 
   const filename = everything ? 'finanzas_completo.xlsx'
